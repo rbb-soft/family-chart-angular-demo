@@ -60,13 +60,16 @@ export class EditComponent implements OnInit {
   }
   /******************************************************************************************************* */
   Form(args:any){
+    const data_stash = args.store.getData();
+  // create editDiv element
     const _style ="padding-top:50px;position: fixed;overflow: auto;width: 350px;height: 100%;top: 0;right: 0;bottom: 0;background-color: rgba(255,255,255,1);color: white;z-index: 2;cursor: pointer;"
     const f3div   = document.querySelector("#FamilyChart");
     let editDiv= document.createElement("div");
     editDiv.setAttribute("style", _style);
     f3div?.append(editDiv);
-
-    let form = document.createElement("form");
+  // create form element
+    let form = document.createElement("form"); 
+  // add inputs and textarea
     args.card_edit.map( (d:any) => {
       let input = document.createElement("input");
       input.setAttribute("type",d.type);
@@ -76,15 +79,54 @@ export class EditComponent implements OnInit {
       input.setAttribute("value",value);
       input.setAttribute("style","clear:both");
       form.appendChild(input);
-    });
-    editDiv.appendChild(form);
+    })
+  // create parent select element
+    const parentSelected = document.createElement("select");
+    parentSelected.setAttribute("name","other_parent");
+    parentSelected.setAttribute("style","clear:both");
+    if(args.rel_datum !== undefined){
+    // check if there is no spouse
+      if(!args.rel_datum.rels.spouses || args.rel_datum.rels.spouses.length === 0){}
+    //  if there spouse 
+      else{
+      // create spouses options
+        args.rel_datum.rels.spouses.map((sp_id:string, i:any) => {
+        // create parent elemt
+          const parent = document.createElement("option");
+        // find parent id
+          const spouse = data_stash.find((d:any) => d.id === sp_id);
+        // find name of parent
+          parent.textContent=args.card_display[0](spouse);
+        // add parent name to option
 
+        // if it already has a parent, select it
+          parent.setAttribute("value",sp_id);
+          if(i === 0){
+            parent.selected;
+          }
+        // add parent option to select
+          parentSelected.appendChild(parent)
+        });
+      }
+    }
+  //create default new parent option
+    const defaultNewOption = document.createElement("option");
+    defaultNewOption.textContent="New";
+    defaultNewOption.setAttribute("valiue","_new");
+  // add default new parent option to select
+    parentSelected.appendChild(defaultNewOption);
+  // add select for parent to form
+    form.appendChild(parentSelected);
+  // add  editDiv to form
+    editDiv.appendChild(form);
+  // create submit element
     let submit = document.createElement("button");
     submit.setAttribute("style","margin-left:25%; padding:15px;border-radius:15");
     submit.setAttribute("type","submit");
     submit.textContent="save";
+  // add submit element to form
     form.appendChild(submit);
-    
+  // set listener submit
     form.addEventListener("submit", (e:Event) => {
       e.preventDefault();
       const formElement = e.target as HTMLFormElement;
@@ -93,17 +135,21 @@ export class EditComponent implements OnInit {
       args.postSubmit()
       editDiv.remove();
     });
-
+  // create close button element
     const closeBtn = document.createElement("button");
     closeBtn.setAttribute("style", "float:right");
     closeBtn.textContent="X";
+  // add close button to form
     form?.prepend(closeBtn);
+  // set listener vlose button
     closeBtn.addEventListener("click",()=>{editDiv.remove()});
-
+  // create delete button element
     const deleteBtn = document.createElement("button");
     deleteBtn.setAttribute("style","margin-left:15px;padding:15px;border-radius:15");
     deleteBtn.textContent="delete";
+  // add delete button ro form
     form.appendChild(deleteBtn);
+  // set listener delete button
     deleteBtn.addEventListener("click",()=>{
       args.postSubmit({delete:true})
     });
@@ -134,12 +180,12 @@ export class EditComponent implements OnInit {
   data() {
     return [
       {
-        "id": "0",
+        "id": "richardID",
         "rels": {
           "father": "d10190e9-3a2f-4ecc-b663-6cfda87c4b26",
           "mother": "3880d51a-28bf-44a9-8546-b572a27aa7d6",
           "spouses": [
-            "a836d151-28fc-4f05-ba3f-d4f7e1c60bbe"
+            "carinaID"
           ],
           "children": [
             "62997598-0786-47a3-901d-80298e33a137"
@@ -164,7 +210,7 @@ export class EditComponent implements OnInit {
         },
         "rels": {
           "children": [
-            "0"
+            "richardID"
           ],
           "spouses": [
             "3880d51a-28bf-44a9-8546-b572a27aa7d6"
@@ -185,12 +231,12 @@ export class EditComponent implements OnInit {
             "d10190e9-3a2f-4ecc-b663-6cfda87c4b26"
           ],
           "children": [
-            "0"
+            "richardID"
           ]
         }
       },
       {
-        "id": "a836d151-28fc-4f05-ba3f-d4f7e1c60bbe",
+        "id": "carinaID",
         "data": {
           "gender": "F",
           "first name": "Carina",
@@ -200,7 +246,7 @@ export class EditComponent implements OnInit {
         },
         "rels": {
           "spouses": [
-            "0"
+            "richardID"
           ],
           "children": [
             "62997598-0786-47a3-901d-80298e33a137"
@@ -217,8 +263,8 @@ export class EditComponent implements OnInit {
           "avatar": ""
         },
         "rels": {
-          "mother": "a836d151-28fc-4f05-ba3f-d4f7e1c60bbe",
-          "father": "0"
+          "mother": "carinaID",
+          "father": "richardID"
         }
       }
       ]
