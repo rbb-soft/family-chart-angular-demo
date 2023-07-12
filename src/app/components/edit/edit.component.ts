@@ -112,7 +112,7 @@ export class EditComponent implements OnInit {
   //create default new parent option
     const defaultNewOption = document.createElement("option");
     defaultNewOption.textContent="New";
-    defaultNewOption.setAttribute("valiue","_new");
+    defaultNewOption.setAttribute("value","_new");
   // add default new parent option to select
     parentSelected.appendChild(defaultNewOption);
   // add select for parent to form
